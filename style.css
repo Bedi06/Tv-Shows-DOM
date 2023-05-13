@@ -5,6 +5,17 @@
   padding: 10px;
   color: white;
 }
+
+.search-container{
+  width: auto;
+  display: flex;
+  justify-content: flex-start;
+  margin-right: 10px;
+
+}
+.search-form{
+  padding-right:5px ;
+}
 .episode-container {
   display: grid;
   grid-template-columns:  1fr 1fr 1fr;

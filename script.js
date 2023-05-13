@@ -1,27 +1,87 @@
-// //You can edit ALL of the code here
-// function setup() {
-//   const allEpisodes = getAllEpisodes();
-//   makePageForEpisodes(allEpisodes);
-// }
 
-// function makePageForEpisodes(episodeList) {
-//   const rootElem = document.getElementById("root");
-//   rootElem.textContent = `Got ${episodeList.length} episode(s)`;
-// }
-
-
-// window.onload = setup;
 // You can edit ALL of the code here
 function setup() {
   const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
+  addSearchBar();
+
+}
+
+
+function addSearchBar() {
+  const body = document.body;
+  let allEpisodes = [];
+
+  // create the search container
+  const searchContainer = document.createElement("div");
+  searchContainer.classList.add("search-container");
+  body.insertBefore(searchContainer, body.firstChild);
+
+  // create the search form
+  const searchForm = document.createElement("form");
+  searchForm.classList.add("search-form");
+  searchContainer.appendChild(searchForm);
+
+  // create the search input
+  const searchInput = document.createElement("input");
+  searchInput.classList.add("search-input");
+  searchInput.type = "search";
+  searchInput.placeholder = "Search episodes";
+  searchForm.appendChild(searchInput);
+
+  // create the search label
+  const searchLabel = document.createElement("label");
+  searchLabel.classList.add("search-label");
+  searchLabel.textContent = "Search episodes";
+  searchLabel.setAttribute("for", "search-input");
+  searchForm.appendChild(searchLabel);
+
+  // fetch the episode data from the API
+  fetch("https://api.tvmaze.com/shows/82/episodes")
+    .then((response) => response.json())
+    .then((data) => {
+      allEpisodes = data;
+      makePageForEpisodes(allEpisodes);
+    })
+    .catch((error) => console.log(error));
+
+  // add event listener to the search input
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.toLowerCase();
+    let filteredEpisodes = allEpisodes.filter((episode) => {
+      const title = `${episode.name} - S${episode.season
+        .toString()
+        .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+      const summary = episode.summary.toLowerCase();
+      return title.includes(query) || summary.includes(query);
+    });
+    if (query.length > 0) {
+      filteredEpisodes.sort((a, b) => {
+        const aTitle = `${a.name} - S${a.season
+          .toString()
+          .padStart(2, "0")}E${a.number.toString().padStart(2, "0")}`;
+        const aSummary = a.summary.toLowerCase();
+        const aRelevance = aTitle.includes(query)
+          ? aTitle.indexOf(query)
+          : aSummary.indexOf(query);
+        const bTitle = `${b.name} - S${b.season
+          .toString()
+          .padStart(2, "0")}E${b.number.toString().padStart(2, "0")}`;
+        const bSummary = b.summary.toLowerCase();
+        const bRelevance = bTitle.includes(query)
+          ? bTitle.indexOf(query)
+          : bSummary.indexOf(query);
+        return aRelevance - bRelevance;
+      });
+    }
+    makePageForEpisodes(filteredEpisodes);
+  });
 }
 
 //building all episodes
 function makePageForEpisodes(episodeList) {
   const rootElem = document.getElementById("root");
   rootElem.textContent = `Got ${episodeList.length} episode(s)`;
-
 
   // create the episode container
   const episodeContainer = document.createElement("div");
@@ -65,8 +125,6 @@ function makePageForEpisodes(episodeList) {
     episodeCard.appendChild(episodeSummary);
   });
 
-
-
  //footer p
  // create the footer
 let footer = document.createElement("footer");
@@ -81,5 +139,6 @@ footer.appendChild(licensing);
 rootElem.appendChild(footer);
 
 }
+//search 
 
 window.onload = setup;
