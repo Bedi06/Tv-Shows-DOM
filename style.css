@@ -8,14 +8,24 @@
 
 .search-container{
   width: auto;
+  height: 100px;
   display: flex;
   justify-content: flex-start;
-  margin-right: 10px;
+  margin:2rem 1rem;
 
 }
-.search-form{
-  padding-right:5px ;
+.search-container,
+.select-container {
+  display: inline-block;
+  margin-right: 20px;
 }
+.select-label{
+  padding-right: 0.5rem;
+}
+.search-label{
+  padding-left: 1em;
+}
+
 .episode-container {
   display: grid;
   grid-template-columns:  1fr 1fr 1fr;
@@ -64,17 +74,30 @@
   padding: 10px 20px;
   text-align: justify;
   overflow: hidden;
-  text-overflow: ellipsis;
-  display: -webkit-box;
-  -webkit-line-clamp: 5;
-  -webkit-box-orient: vertical;
   font-size: 12px;
+}
+
+.welcome-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem 0;
 }
 
 footer{
   bottom: 0;
   width: 100%;
-  background-color: #f2f2f2;
-  padding: 10px;
+  background-color: #767b9b;
   text-align: center;
+  width: auto;
+  height: 100px;
+  color: #070606;
+  padding-top: 1em;
+}
+footer p a {
+  color: #000;
+  display: block;
+  width: 100%;
+  font-style: italic;
+  
 }

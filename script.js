@@ -1,16 +1,17 @@
 
 // You can edit ALL of the code here
+const allEpisodes = getAllEpisodes();
+
 function setup() {
-  const allEpisodes = getAllEpisodes();
   makePageForEpisodes(allEpisodes);
-  addSearchBar();
+  addSearchField();
+  addSelectField();
 
 }
 
-
-function addSearchBar() {
+//level-200
+function addSearchField() {
   const body = document.body;
-  let allEpisodes = [];
 
   // create the search container
   const searchContainer = document.createElement("div");
@@ -32,62 +33,104 @@ function addSearchBar() {
   // create the search label
   const searchLabel = document.createElement("label");
   searchLabel.classList.add("search-label");
-  searchLabel.textContent = "Search episodes";
   searchLabel.setAttribute("for", "search-input");
   searchForm.appendChild(searchLabel);
-
-  // fetch the episode data from the API
-  fetch("https://api.tvmaze.com/shows/82/episodes")
-    .then((response) => response.json())
-    .then((data) => {
-      allEpisodes = data;
-      makePageForEpisodes(allEpisodes);
-    })
-    .catch((error) => console.log(error));
 
   // add event listener to the search input
   searchInput.addEventListener("input", () => {
     const query = searchInput.value.toLowerCase();
-    let filteredEpisodes = allEpisodes.filter((episode) => {
+    const filteredEpisodes = allEpisodes.filter((episode) => {
       const title = `${episode.name} - S${episode.season
         .toString()
         .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
-      const summary = episode.summary.toLowerCase();
-      return title.includes(query) || summary.includes(query);
+      const titleMatch = title.toLowerCase().includes(query);
+      const summaryMatch = episode.summary.toLowerCase().includes(query);
+      return titleMatch || summaryMatch;
     });
-    if (query.length > 0) {
-      filteredEpisodes.sort((a, b) => {
-        const aTitle = `${a.name} - S${a.season
-          .toString()
-          .padStart(2, "0")}E${a.number.toString().padStart(2, "0")}`;
-        const aSummary = a.summary.toLowerCase();
-        const aRelevance = aTitle.includes(query)
-          ? aTitle.indexOf(query)
-          : aSummary.indexOf(query);
-        const bTitle = `${b.name} - S${b.season
-          .toString()
-          .padStart(2, "0")}E${b.number.toString().padStart(2, "0")}`;
-        const bSummary = b.summary.toLowerCase();
-        const bRelevance = bTitle.includes(query)
-          ? bTitle.indexOf(query)
-          : bSummary.indexOf(query);
-        return aRelevance - bRelevance;
-      });
-    }
+
+    // update the episode list with the filtered episodes
     makePageForEpisodes(filteredEpisodes);
+
+    // update the search label with the number of filtered episodes
+    searchLabel.textContent = `Displaying ${filteredEpisodes.length} /73 episode(s)`;
   });
+
+  // set the initial search label text
+  searchLabel.textContent = `Displaying ${allEpisodes.length} /73 episode(s)`;
 }
 
+//level-300 
+
+function addSelectField() {
+  const body = document.body;
+
+  // create the select container
+  const selectContainer = document.createElement("div");
+  selectContainer.classList.add("select-container");
+
+  body.insertBefore(selectContainer, body.firstChild);
+
+  // create the select label
+  const selectLabel = document.createElement("label");
+  selectLabel.classList.add("select-label");
+  selectLabel.textContent = "Select an episode:";
+  selectContainer.appendChild(selectLabel);
+
+   // create the select input
+   const selectInput = document.createElement("select");
+   selectInput.classList.add("select-input");
+   selectInput.addEventListener("change", () => {
+     const episodeId = selectInput.value;
+     if (episodeId === "all-episodes") {
+       makePageForEpisodes(allEpisodes);
+     } else {
+       const selectedEpisode = allEpisodes.find((episode) => episode.id == episodeId);
+       makePageForEpisodes([selectedEpisode]);
+     }
+   });
+   selectContainer.appendChild(selectInput);
+
+  // add the option elements to the select input
+  allEpisodes.forEach((episode) => {
+    const option = document.createElement("option");
+    option.value = episode.id;
+    option.textContent = `${episode.name} - S${episode.season.toString().padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+    selectInput.appendChild(option);
+  });
+
+  // set the initial selected option to "All Episodes"
+  const allOption = document.createElement("option");
+  allOption.value = "all-episodes";
+  allOption.textContent = "All Episodes";
+  selectInput.insertBefore(allOption, selectInput.firstChild);
+  selectInput.value = allOption.value;
+}
+
+//level -100
 //building all episodes
 function makePageForEpisodes(episodeList) {
+
   const rootElem = document.getElementById("root");
-  rootElem.textContent = `Got ${episodeList.length} episode(s)`;
+  rootElem.innerHTML = "";
+
+
+ // create the welcome container
+ const welcomeContainer = document.createElement("div");
+ welcomeContainer.classList.add("welcome-container");
+ rootElem.appendChild(welcomeContainer);
+
+ // create the welcome message
+ const welcomeMessage = document.createElement("h1");
+ welcomeMessage.classList.add("welcome-message");
+ welcomeMessage.textContent = "Welcome to my TV show project!";
+ welcomeContainer.appendChild(welcomeMessage);
 
   // create the episode container
   const episodeContainer = document.createElement("div");
   episodeContainer.classList.add("episode-container");
   rootElem.appendChild(episodeContainer);
 
+  
   episodeList.forEach((episode) => {
     // create the episode card
     let episodeCard = document.createElement("div");
@@ -125,6 +168,7 @@ function makePageForEpisodes(episodeList) {
     episodeCard.appendChild(episodeSummary);
   });
 
+
  //footer p
  // create the footer
 let footer = document.createElement("footer");
@@ -137,8 +181,8 @@ footer.appendChild(licensing);
 
 // append the footer to the episode container
 rootElem.appendChild(footer);
-
 }
+
 //search 
 
 window.onload = setup;
