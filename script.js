@@ -1,12 +1,25 @@
 
 // You can edit ALL of the code here
-const allEpisodes = getAllEpisodes();
+let allEpisodes;
 
-function setup() {
+async function setup() {
+  allEpisodes = await getEpisodes();
   makePageForEpisodes(allEpisodes);
   addSearchField();
   addSelectField();
+}
 
+//level-350  
+//Fetching live data
+
+async function getEpisodes() {
+  try {
+    const response = await fetch('https://api.tvmaze.com/shows/82/episodes');
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error fetching episodes:', error);
+  }
 }
 
 //level-200
@@ -108,7 +121,7 @@ function addSelectField() {
 
 //level -100
 //building all episodes
-function makePageForEpisodes(episodeList) {
+function makePageForEpisodes(allEpisodes) {
 
   const rootElem = document.getElementById("root");
   rootElem.innerHTML = "";
@@ -131,7 +144,7 @@ function makePageForEpisodes(episodeList) {
   rootElem.appendChild(episodeContainer);
 
   
-  episodeList.forEach((episode) => {
+  allEpisodes.forEach((episode) => {
     // create the episode card
     let episodeCard = document.createElement("div");
     episodeCard.classList.add("episode-card");
