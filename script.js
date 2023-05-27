@@ -84,13 +84,13 @@ function addSearchField() {
 
   // add event listener to the search input
   searchInput.addEventListener("input", () => {
-    const query = searchInput.value.toLowerCase();
-    const filteredEpisodes = allEpisodes.filter((episode) => {
-      const title = `${episode.name} - S${episode.season
+    let query = searchInput.value.toLowerCase();
+    let filteredEpisodes = allEpisodes.filter((episode) => {
+      let title = `${episode.name} - S${episode.season
         .toString()
         .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
-      const titleMatch = title.toLowerCase().includes(query);
-      const summaryMatch = episode.summary.toLowerCase().includes(query);
+      let titleMatch = title.toLowerCase().includes(query);
+      let summaryMatch = episode.summary.toLowerCase().includes(query);
       return titleMatch || summaryMatch;
     });
 
@@ -133,7 +133,7 @@ function addSelectField() {
 
   // add the option elements to the select input
   allEpisodes.forEach((episode) => {
-    const option = document.createElement("option");
+    let option = document.createElement("option");
     option.value = episode.id;
     option.textContent = `${episode.name} - S${episode.season
       .toString()
@@ -142,7 +142,7 @@ function addSelectField() {
   });
 
   // set the initial selected option to "All Episodes"
-  const allOption = document.createElement("option");
+  let allOption = document.createElement("option");
   allOption.value = "all-episodes";
   allOption.textContent = "All Episodes";
   selectInput.insertBefore(allOption, selectInput.firstChild);
@@ -155,9 +155,10 @@ function makePageForEpisodes(allEpisodes) {
   rootElem.innerHTML = "";
 
   // create the episode container
-  const episodeContainer = document.createElement("div");
+  let episodeContainer = document.createElement("div");
   episodeContainer.classList.add("episode-container");
   rootElem.appendChild(episodeContainer);
+
 
   allEpisodes.forEach((episode) => {
     // create the episode card
