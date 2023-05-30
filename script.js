@@ -1,20 +1,23 @@
-
-// You can edit ALL of the code here
+let allShows;
 let allEpisodes;
 
 async function setup() {
-  allEpisodes = await getEpisodes();
+  allShows = getAllShows();
+  const selectedShowId = allShows[0].id; // Selecting  the first show by default
+  allEpisodes = await getEpisodes(selectedShowId);
+
   createHeader();
-  addSelectField();
+  showSelectField(allShows);
+  episodeSelectField(allEpisodes);
   addSearchField();
   makePageForEpisodes(allEpisodes);
   createFooter();
 }
 
-// Fetching live data
-async function getEpisodes() {
+// Fetching episodes for shows
+async function getEpisodes(showId) {
   try {
-    const response = await fetch('https://api.tvmaze.com/shows/82/episodes');
+    const response = await fetch(`https://api.tvmaze.com/shows/${showId}/episodes`);
     const data = await response.json();
     return data;
   } catch (error) {
@@ -22,6 +25,60 @@ async function getEpisodes() {
   }
 }
 
+// level 400 -adding show selector
+function showSelectField(shows) {
+  const searchSelectDiv = document.querySelector(".search-select");
+
+  const showContainer = document.createElement("div");
+  showContainer.classList.add("show-container");
+
+  const showSelect = document.createElement("select");
+  showSelect.classList.add("show-select");
+  showSelect.addEventListener("change", () => {
+    const selectedShowId = showSelect.value;
+    getEpisodes(selectedShowId)
+      .then((episodes) => {
+        allEpisodes = episodes;
+        makePageForEpisodes(allEpisodes);
+        updateEpisodeSelect(allEpisodes);
+      })
+      .catch((error) => console.error(error));
+  });
+
+  shows.forEach((show) => {
+    const option = document.createElement("option");
+    option.value = show.id;
+    option.textContent = show.name;
+    showSelect.appendChild(option);
+  });
+
+  showContainer.appendChild(showSelect);
+  searchSelectDiv.appendChild(showContainer);
+}
+
+//updating the select field to get episodes from all shows
+function updateEpisodeSelect(episodes) {
+  const episodeSelect = document.querySelector(".episode-select");
+  episodeSelect.innerHTML = "";
+
+  const selectOption = document.createElement("option");
+  selectOption.value = "select-episode";
+  selectOption.textContent = "Select Episode";
+  episodeSelect.appendChild(selectOption);
+
+  episodes.forEach((episode) => {
+    const option = document.createElement("option");
+    option.value = episode.id;
+    option.textContent = `${episode.name} - S${episode.season
+      .toString()
+      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+    episodeSelect.appendChild(option);
+  });
+}
+
+
+
+//Creating the header of page
 function createHeader() {
   const body = document.body;
 
@@ -41,10 +98,11 @@ function createHeader() {
   searchSelectDiv.classList.add("search-select");
   header.appendChild(searchSelectDiv);
 }
+
+//creating footer 
 function createFooter() {
   const body = document.body;
 
-  // create the footer
   let footer = document.createElement("footer");
   footer.classList.add("footer");
 
@@ -57,6 +115,44 @@ function createFooter() {
   body.appendChild(footer);
 }
 
+//level 300-adding an episode selector 
+function episodeSelectField(episodes) {
+  const searchSelectDiv = document.querySelector(".search-select");
+
+  const episodeSelectContainer = document.createElement("div");
+  episodeSelectContainer.classList.add("episode-select-container");
+
+  const episodeSelect = document.createElement("select");
+  episodeSelect.classList.add("episode-select");
+  episodeSelect.addEventListener("change", () => {
+    const episodeId = episodeSelect.value;
+    if (episodeId === "select-episode") {
+      makePageForEpisodes(allEpisodes);
+    } else {
+      const selectedEpisode = allEpisodes.find((episode) => episode.id == episodeId);
+      makePageForEpisodes([selectedEpisode]);
+    }
+  });
+
+  const selectOption = document.createElement("option");
+  selectOption.value = "select-episode";
+  selectOption.textContent = "Select Episode";
+  episodeSelect.appendChild(selectOption);
+
+  episodes.forEach((episode) => {
+    const option = document.createElement("option");
+    option.value = episode.id;
+    option.textContent = `${episode.name} - S${episode.season
+      .toString()
+      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+    episodeSelect.appendChild(option);
+  });
+
+  episodeSelectContainer.appendChild(episodeSelect);
+  searchSelectDiv.appendChild(episodeSelectContainer);
+}
+
+// Level 200 - Add search field for episodes
 function addSearchField() {
   const searchSelectDiv = document.querySelector(".search-select");
 
@@ -70,8 +166,7 @@ function addSearchField() {
   searchInput.classList.add("search-input");
   searchInput.type = "search";
   searchInput.placeholder = "Search episodes";
-  searchInput.id = "search-input"; // Assign a unique id to the search input field
-
+  searchInput.id = "search-input";
 
   const searchLabel = document.createElement("label");
   searchLabel.classList.add("search-label");
@@ -98,57 +193,19 @@ function addSearchField() {
     makePageForEpisodes(filteredEpisodes);
 
     // update the search label with the number of filtered episodes
-    searchLabel.textContent = `Displaying ${filteredEpisodes.length} /73 episodes`;
+    searchLabel.textContent = `Displaying ${filteredEpisodes.length} / ${allEpisodes.length} episodes`;
   });
 
   // set the initial search label text
-  searchLabel.textContent = `Displaying ${allEpisodes.length} /73 episodes`;
+  searchLabel.textContent = `Displaying ${allEpisodes.length} / ${allEpisodes.length} episodes`;
 }
 
-//level-300 
-function addSelectField() {
-  const searchSelectDiv = document.querySelector(".search-select");
 
-  const selectContainer = document.createElement("div");
-  selectContainer.classList.add("select-container");
 
-  
-  // create the select input
-  const selectInput = document.createElement("select");
-  selectInput.classList.add("select-input");
-  selectInput.addEventListener("change", () => {
-    const episodeId = selectInput.value;
-    if (episodeId === "select-episode") {
-      makePageForEpisodes(allEpisodes);
-    } else {
-      const selectedEpisode = allEpisodes.find((episode) => episode.id == episodeId);
-      makePageForEpisodes([selectedEpisode]);
-    }
-  });
-  selectContainer.appendChild(selectInput);
 
-  // add the default "Select Episode" option to the select input
-  let selectOption = document.createElement("option");
-  selectOption.value = "select-episode";
-  selectOption.textContent = "Select Episode";
-  selectInput.appendChild(selectOption);
 
-  // add the option elements to the select input
-  allEpisodes.forEach((episode) => {
-    let option = document.createElement("option");
-    option.value = episode.id;
-    option.textContent = `${episode.name} - S${episode.season
-      .toString()
-      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
-    selectInput.appendChild(option);
-  });
-
-  searchSelectDiv.appendChild(selectContainer);
-}
-
-//level -100
-//building all episodes
-function makePageForEpisodes(allEpisodes) {
+// Level 100 - Building episodes cards
+function makePageForEpisodes(episodes) {
   const rootElem = document.getElementById("root");
   rootElem.innerHTML = "";
 
@@ -157,34 +214,26 @@ function makePageForEpisodes(allEpisodes) {
   episodeContainer.classList.add("episode-container");
   rootElem.appendChild(episodeContainer);
 
-  allEpisodes.forEach((episode) => {
+  episodes.forEach((episode) => {
     // create the episode card
     let episodeCard = document.createElement("div");
     episodeCard.classList.add("episode-card");
     episodeContainer.appendChild(episodeCard);
 
-    // create the episode info container
-    let episodeInfoContainer = document.createElement("div");
-    episodeInfoContainer.classList.add("episode-info-container");
-    episodeCard.appendChild(episodeInfoContainer);
-
     // create the episode title
     let episodeTitle = document.createElement("h2");
     episodeTitle.classList.add("episode-title");
-    episodeTitle.textContent = `${episode.name} - S${episode.season.toString().padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
-    episodeInfoContainer.appendChild(episodeTitle);
-
-    // create the episode image container
-    let episodeImageContainer = document.createElement("div");
-    episodeImageContainer.classList.add("episode-image-container");
-    episodeCard.appendChild(episodeImageContainer);
+    episodeTitle.textContent = `${episode.name} - S${episode.season
+      .toString()
+      .padStart(2, "0")}E${episode.number.toString().padStart(2, "0")}`;
+    episodeCard.appendChild(episodeTitle);
 
     // create the episode image
     let episodeImage = document.createElement("img");
     episodeImage.classList.add("episode-image");
-    episodeImage.src = episode.image.medium;
+    episodeImage.src = episode.image ? episode.image.medium : "";
     episodeImage.alt = `Screenshot from ${episode.name} episode`;
-    episodeImageContainer.appendChild(episodeImage);
+    episodeCard.appendChild(episodeImage);
 
     // create the episode summary
     let episodeSummary = document.createElement("p");
@@ -192,8 +241,7 @@ function makePageForEpisodes(allEpisodes) {
     episodeSummary.innerHTML = episode.summary;
     episodeCard.appendChild(episodeSummary);
   });
-
-  
 }
+
 
 window.onload = setup;
