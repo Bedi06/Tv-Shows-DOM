@@ -84,7 +84,9 @@ label.search-results-label {
   font-family: 'Open Sans', sans-serif;
 
 }
-
+button{
+  color: #d40c0c;
+}
 .additional-details{
   border-style:groove ;
   padding: 1rem;

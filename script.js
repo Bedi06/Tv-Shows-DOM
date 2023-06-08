@@ -39,7 +39,20 @@ function getEpisodes(showId) {
 }
 
 
+function backToShows() {
+let rootElem = document.getElementById("root");
 
+let showsButton = document.createElement("button");
+showsButton.classList.add("backToShows");
+
+showsButton.textContent = "Back to Shows";
+
+showsButton.addEventListener("click", function () {
+  showListing(); 
+});
+rootElem.appendChild(showsButton);
+
+}
 
 function searchShows(searchValue, showSelect) {
   let searchResults;
@@ -87,7 +100,7 @@ function searchShows(searchValue, showSelect) {
 
 
 function createShowSearch() {
-  const showSearch = document.querySelector(".search-select");
+const showSearch = document.querySelector(".search-select");
 
 showSearchContainer = document.createElement("div");
 showSearchContainer.classList.add("show-search-container");
@@ -134,6 +147,7 @@ showSearchContainer.classList.add("show-search-container");
     } else {
       searchResults = allShows;
     }
+    showListing(searchValue);
 
     while (showSelect.firstChild) {
       showSelect.removeChild(showSelect.firstChild);
@@ -161,7 +175,7 @@ showSearchContainer.classList.add("show-search-container");
 
 
 
-function showListing() {
+function showListing(searchValue="") {
   const rootElem = document.getElementById("root");
   rootElem.innerHTML = "";
 
@@ -176,8 +190,20 @@ function showListing() {
   }
 
   allShows.forEach((show) => {
-    const showCard = createShowCard(show);
-    showContainer.appendChild(showCard);
+    const lowerCaseName = show.name.toLowerCase();
+    const lowerCaseGenres = show.genres.join(", ").toLowerCase();
+    const lowerCaseSummary = show.summary.toLowerCase();
+
+    if (
+      searchValue === "" ||
+      lowerCaseName.includes(searchValue.toLowerCase()) ||
+      lowerCaseGenres.includes(searchValue.toLowerCase()) ||
+      lowerCaseSummary.includes(searchValue.toLowerCase())
+    ) {
+      const showCard = createShowCard(show);
+      showContainer.appendChild(showCard);
+      }
+      
   });
 }
 
@@ -249,6 +275,7 @@ function createShowCard(show) {
         addSearchField();
         makePageForEpisodes(allEpisodes);
         updateEpisodeSelect(allEpisodes);
+        backToShows();
       })
       .catch((error) => console.error(error));
   });
