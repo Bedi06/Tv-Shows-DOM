@@ -11,8 +11,6 @@ let searchInput;
 let episodeSelect;
 let showSearchContainer;
 
-
-
 async function setup() {
   allShows = await getAllShows();
   const selectedShowId = allShows[0].id; // Selecting the first show by default
@@ -27,31 +25,29 @@ async function setup() {
 // Fetching episodes for shows
 function getEpisodes(showId) {
   return fetch(`https://api.tvmaze.com/shows/${showId}/episodes`)
-    .then(response => {
+    .then((response) => {
       if (!response.ok) {
-        throw new Error('Error fetching episodes');
+        throw new Error("Error fetching episodes");
       }
       return response.json();
     })
-    .catch(error => {
-      console.error('Error fetching episodes:', error);
+    .catch((error) => {
+      console.error("Error fetching episodes:", error);
     });
 }
 
-
 function backToShows() {
-let rootElem = document.getElementById("root");
+  let rootElem = document.getElementById("root");
 
-let showsButton = document.createElement("button");
-showsButton.classList.add("backToShows");
+  let showsButton = document.createElement("button");
+  showsButton.classList.add("backToShows");
 
-showsButton.textContent = "Back to Shows";
+  showsButton.textContent = "Back to Shows";
 
-showsButton.addEventListener("click", function () {
-  showListing(); 
-});
-rootElem.appendChild(showsButton);
-
+  showsButton.addEventListener("click", function () {
+    showListing();
+  });
+  rootElem.appendChild(showsButton);
 }
 
 function searchShows(searchValue, showSelect) {
@@ -73,7 +69,6 @@ function searchShows(searchValue, showSelect) {
     });
 
     addSelectOption(showSelect, "Select Show");
-
   } else {
     searchResults = allShows;
   }
@@ -87,7 +82,6 @@ function searchShows(searchValue, showSelect) {
     option.value = show.id;
     option.textContent = show.name;
     showSelect.appendChild(option);
-    
   });
   const resultsLabel = document.querySelector(".search-results-label");
   if (searchValue !== "") {
@@ -98,13 +92,11 @@ function searchShows(searchValue, showSelect) {
   }
 }
 
-
 function createShowSearch() {
-const showSearch = document.querySelector(".search-select");
+  const showSearch = document.querySelector(".search-select");
 
-showSearchContainer = document.createElement("div");
-showSearchContainer.classList.add("show-search-container");
-
+  showSearchContainer = document.createElement("div");
+  showSearchContainer.classList.add("show-search-container");
 
   const searchLabel = document.createElement("label");
   searchLabel.textContent = "Filtering for...";
@@ -123,10 +115,10 @@ showSearchContainer.classList.add("show-search-container");
   showSearchContainer.appendChild(showSearchInput);
   showSearchContainer.appendChild(resultsLabel);
 
-  showSearchInput.addEventListener('input', handleSearchInput);
+  showSearchInput.addEventListener("input", handleSearchInput);
 
   function handleSearchInput() {
-    showSearchInput.removeAttribute('placeholder');
+    showSearchInput.removeAttribute("placeholder");
 
     const searchValue = showSearchInput.value.toLowerCase();
     let searchResults;
@@ -173,9 +165,7 @@ showSearchContainer.classList.add("show-search-container");
   return showSearchContainer;
 }
 
-
-
-function showListing(searchValue="") {
+function showListing(searchValue = "") {
   const rootElem = document.getElementById("root");
   rootElem.innerHTML = "";
 
@@ -185,7 +175,7 @@ function showListing(searchValue="") {
   rootElem.appendChild(showContainer);
 
   if (episodeSelectContainer) {
-    // Hiding the episode select field if 
+    // Hiding the episode select field if
     episodeSelectContainer.style.display = "none";
   }
 
@@ -202,8 +192,7 @@ function showListing(searchValue="") {
     ) {
       const showCard = createShowCard(show);
       showContainer.appendChild(showCard);
-      }
-      
+    }
   });
 }
 
@@ -212,57 +201,56 @@ function createShowCard(show) {
   // Creating the show card
   const showCard = document.createElement("div");
   showCard.classList.add("show-card");
-  
+
   const showName = document.createElement("h2");
   showName.classList.add("show-name");
   showName.textContent = show.name;
   showCard.appendChild(showName);
-  
+
   const showDetails = document.createElement("div");
   showDetails.classList.add("show-details");
   showCard.appendChild(showDetails);
-  
+
   // Creating a div to wrap the image and summary
   const imageSummaryDiv = document.createElement("div");
   imageSummaryDiv.classList.add("image-summary");
   showDetails.appendChild(imageSummaryDiv);
-  
+
   const showImage = document.createElement("img");
   showImage.classList.add("show-image");
   showImage.src = show.image ? show.image.medium : "";
   showImage.alt = `Poster of ${show.name}`;
   imageSummaryDiv.appendChild(showImage);
-  
+
   const showSummary = document.createElement("p");
   showSummary.classList.add("show-summary");
   showSummary.innerHTML = show.summary;
   imageSummaryDiv.appendChild(showSummary);
-  
+
   // Creating a div to wrap the additional details
   const additionalDetailsDiv = document.createElement("div");
   additionalDetailsDiv.classList.add("additional-details");
   showDetails.appendChild(additionalDetailsDiv);
-  
+
   const showRated = document.createElement("p");
   showRated.classList.add("show-rated");
   showRated.textContent = `Rated: ${show.rating.average}`;
   additionalDetailsDiv.appendChild(showRated);
-  
+
   const showGenres = document.createElement("p");
   showGenres.classList.add("show-genres");
   showGenres.textContent = `Genres: ${show.genres.join(", ")}`;
   additionalDetailsDiv.appendChild(showGenres);
-  
+
   const showStatus = document.createElement("p");
   showStatus.classList.add("show-status");
   showStatus.textContent = `Status: ${show.status}`;
   additionalDetailsDiv.appendChild(showStatus);
-  
+
   const showRuntime = document.createElement("p");
   showRuntime.classList.add("show-runtime");
   showRuntime.textContent = `Runtime: ${show.runtime} minutes`;
   additionalDetailsDiv.appendChild(showRuntime);
-  
 
   // Add click event listener to show name -- back to show button TO BE DONE
   showName.addEventListener("click", () => {
@@ -302,7 +290,7 @@ function removeSearchField() {
   if (searchContainer && searchContainer.parentNode) {
     searchContainer.parentNode.removeChild(searchContainer);
   }
-  searchContainer = null; 
+  searchContainer = null;
 }
 
 function hideShowSearchField() {
@@ -327,7 +315,7 @@ function showSelectField(shows) {
 
   showSelect = document.createElement("select");
   showSelect.classList.add("show-select");
-  showSelect.addEventListener("change", handleShowSelectChange); 
+  showSelect.addEventListener("change", handleShowSelectChange);
 
   addSelectOption(showSelect, "Select Show");
 
@@ -423,7 +411,9 @@ function episodeSelectField(episodes) {
     if (episodeId === "select-episode") {
       makePageForEpisodes(allEpisodes);
     } else {
-      const selectedEpisode = allEpisodes.find((episode) => episode.id == episodeId);
+      const selectedEpisode = allEpisodes.find(
+        (episode) => episode.id == episodeId
+      );
       makePageForEpisodes([selectedEpisode]);
     }
   });
@@ -445,7 +435,7 @@ function episodeSelectField(episodes) {
   episodeSelectContainer.appendChild(episodeSelect);
   searchSelectDiv.appendChild(episodeSelectContainer);
 
-  hideShowSearchField(); 
+  hideShowSearchField();
   // Hiding the search field for shows in the episodes display
 }
 
@@ -497,8 +487,6 @@ function addSearchField() {
   searchLabel.textContent = `Displaying ${allEpisodes.length} / ${allEpisodes.length} episodes`;
 }
 
-
-
 //Creating the header of page
 function createHeader() {
   const body = document.body;
@@ -507,17 +495,23 @@ function createHeader() {
   header.classList.add("header");
   body.insertBefore(header, body.firstChild);
 
-  const titleHeader = document.createElement("h1");
-  titleHeader.classList.add("title");
-  titleHeader.textContent = "Cineflix";
-  header.appendChild(titleHeader);
+  const titleAnchor = document.createElement("a");
+  titleAnchor.setAttribute("href", "#");
+  titleAnchor.classList.add("title");
+  titleAnchor.textContent = "Cineflix";
+  header.appendChild(titleAnchor);
 
   const searchSelectDiv = document.createElement("div");
   searchSelectDiv.classList.add("search-select");
   header.appendChild(searchSelectDiv);
+
+  titleAnchor.addEventListener("click", function (event) {
+    event.preventDefault();
+    showListing();
+  });
 }
 
-//creating footer 
+//creating footer
 function createFooter() {
   const body = document.body;
 
@@ -532,7 +526,6 @@ function createFooter() {
   // appending it to the footer to the body
   body.appendChild(footer);
 }
-
 
 // Level 100 - Building episodes cards
 function makePageForEpisodes(episodes) {
@@ -566,9 +559,6 @@ function makePageForEpisodes(episodes) {
     episodeSummary.innerHTML = episode.summary;
     episodeCard.appendChild(episodeSummary);
   });
-
-  
 }
-
 
 window.onload = setup;
