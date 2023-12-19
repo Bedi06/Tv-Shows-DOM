@@ -37,7 +37,5 @@ Explore the TV shows and episodes, observing how the DOM dynamically updates bas
 
 Credits
 This web app uses data from TVMaze.
-License
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 Happy watching! 🍿📺
